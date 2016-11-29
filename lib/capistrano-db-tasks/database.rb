@@ -108,7 +108,8 @@ module Database
       @cap.info "Loading remote database config"
       @cap.within @cap.current_path do
         @cap.with rails_env: @cap.fetch(:rails_env) do
-          dirty_config_content = @cap.capture(:rails, "runner \"puts '#{DBCONFIG_BEGIN_FLAG}' + ActiveRecord::Base.connection.instance_variable_get(:@config).to_yaml + '#{DBCONFIG_END_FLAG}'\"", '2>/dev/null')
+          dirty_config_content = @cap.capture(:rails, "
+\"puts '#{DBCONFIG_BEGIN_FLAG}' + ActiveRecord::Base.connection.instance_variable_get(:@config).to_yaml + '#{DBCONFIG_END_FLAG}'\"", '2>/dev/null')
           # Remove all warnings, errors and artefacts produced by bunlder, rails and other useful tools
           config_content = dirty_config_content.match(/#{DBCONFIG_BEGIN_FLAG}(.*?)#{DBCONFIG_END_FLAG}/m)[1]
           @config = YAML.load(config_content).each_with_object({}) { |(k, v), h| h[k.to_s] = v }
@@ -152,7 +153,7 @@ module Database
     def initialize(cap_instance)
       super(cap_instance)
       @cap.info "Loading local database config"
-      command = "#{Dir.pwd}/bin/rails runner \"puts '#{DBCONFIG_BEGIN_FLAG}' + ActiveRecord::Base.connection.instance_variable_get(:@config).to_yaml + '#{DBCONFIG_END_FLAG}'\""
+      command = "#{Dir.pwd}/script/rails runner \"puts '#{DBCONFIG_BEGIN_FLAG}' + ActiveRecord::Base.connection.instance_variable_get(:@config).to_yaml + '#{DBCONFIG_END_FLAG}'\""
       stdout, status = Open3.capture2(command)
       raise "Error running command (status=#{status}): #{command}" if status != 0
 
