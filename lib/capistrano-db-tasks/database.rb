@@ -75,7 +75,7 @@ module Database
         "mysql #{credentials} -D #{database} < #{file}"
       elsif postgresql?
         terminate_connection_sql = "SELECT pg_terminate_backend(pg_stat_activity.pid) FROM pg_stat_activity WHERE pg_stat_activity.datname = '#{database}' AND pid <> pg_backend_pid();"
-        "#{pgpass} psql -c \"#{terminate_connection_sql};\" #{credentials} #{database}; #{pgpass} dropdb #{credentials} #{database}; #{pgpass} createdb #{credentials} #{database}; #{pgpass} pg_restore --clean -O #{credentials} -d #{database} < #{file}"
+        "#{pgpass} psql -c \"#{terminate_connection_sql};\" #{credentials} #{database}; #{pgpass} pg_restore --clean -O #{credentials} -d #{database} < #{file}"
       end
     end
 
@@ -83,7 +83,7 @@ module Database
       if mysql?
         "--lock-tables=false #{dump_cmd_ignore_tables_opts} #{dump_cmd_ignore_data_tables_opts}"
       elsif postgresql?
-        "--no-owner --no-privileges --clean -N 'information_schema' -N '^pg_*' --format=c #{dump_cmd_ignore_tables_opts} #{dump_cmd_ignore_data_tables_opts}"
+        "-N 'information_schema' -N '^pg_*' --format=c #{dump_cmd_ignore_tables_opts} #{dump_cmd_ignore_data_tables_opts}"
       end
     end
 
