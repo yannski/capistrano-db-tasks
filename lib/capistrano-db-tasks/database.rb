@@ -83,7 +83,7 @@ module Database
       if mysql?
         "--lock-tables=false #{dump_cmd_ignore_tables_opts} #{dump_cmd_ignore_data_tables_opts}"
       elsif postgresql?
-        "--no-acl --no-owner #{dump_cmd_ignore_tables_opts} #{dump_cmd_ignore_data_tables_opts}"
+        "--no-owner --no-privileges --clean -N 'information_schema' -N '^pg_*' --format=c #{dump_cmd_ignore_tables_opts} #{dump_cmd_ignore_data_tables_opts}"
       end
     end
 
